@@ -8,15 +8,7 @@
     ],
     "routes": [
         {
-            "src": "/api/register",
-            "dest": "src/routes/index.routes.ts"
-        },
-        {
-            "src": "/api/users",
-            "dest": "src/routes/index.routes.ts"
-        },
-        {
-            "src": "/(.*)",
+            "src": "(.*)",
             "dest": "src/shared/server.ts"
         }
     ]
