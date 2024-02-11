@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev src/shared/server.ts",
-    "build": "npx prisma generate deploy && next build",
+    "build": "yarn",
     "start": "ts-node-dev src/shared/server.ts"
   },
   "keywords": [],
