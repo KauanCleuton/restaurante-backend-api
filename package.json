@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev src/shared/server.ts",
     "start": "ts-node-dev src/shared/server.ts",
-    "build": "echo 'running build'"
+    "vercel-build": "npx prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
