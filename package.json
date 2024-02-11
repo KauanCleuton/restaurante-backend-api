@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev src/shared/server.ts",
-    "build": "yarn && npx prisma generate deploy",
+    "dev": "ts-node-dev src/shared/server.ts && npx prisma generate deploy",
+    "build": "yarn",
     "start": "ts-node-dev src/shared/server.ts"
   },
   "keywords": [],
