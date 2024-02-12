@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,13 +8,69 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  email      String   @unique
-  name       String?
-  foto_url   String?
-  password   String
-  created_at DateTime
-  logged     Boolean  @default(false)
-  role       String   @default("user")
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String?
+  foto_url     String?
+  password     String
+  created_at   DateTime
+  logged       Boolean       @default(false)
+  role         String        @default("user")
+  pedidos      Pedidos[] // Relação com Pedidos
+  reservations Reservation[]
+  assessments  Assessments[]
+
   @@map("users")
+}
+
+model Pedidos {
+  id            String     @id @default(uuid())
+  numero_pedido Int        @default(autoincrement())
+  created_at    DateTime
+  user          User       @relation(fields: [client_id], references: [id])
+  client_id     String
+  status        String
+  products      Products[]
+
+  @@map("pedidos")
+}
+
+model Products {
+  id          Int       @id
+  name        String
+  description String
+  price       Float
+  category    String
+  pedidos     Pedidos[]
+
+  @@map("products")
+}
+
+model Mesa {
+  number   Int    @unique
+  status   String @default("livre")
+  location String
+
+  @@map("mesas")
+}
+
+model Reservation {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [client_id], references: [id])
+  client_id       String   @map("client_id")
+  number_persons  Int
+  dateReservation DateTime
+  status          String
+
+  @@map("reservations")
+}
+
+model Assessments {
+  id         Int     @id @unique @default(autoincrement())
+  avaliacao  Float
+  comentario String
+  user       User?   @relation(fields: [userId], references: [id])
+  userId     String?
+
+  @@map("assessments")
 }
