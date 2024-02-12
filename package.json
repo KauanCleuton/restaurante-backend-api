@@ -7,9 +7,9 @@
     "node": "20"
   },
   "scripts": {
-    "dev": "ts-node-dev src/shared/server.ts && npx prisma generate deploy",
+    "dev": "ts-node-dev src/shared/server.ts",
     "build": "tsup src",
-    "start": "ts-node-dev src/shared/server.ts"
+    "start": "node dist/shared/server.js"
   },
   "keywords": [],
   "author": "",
