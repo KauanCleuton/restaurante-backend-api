@@ -37,6 +37,7 @@ model Pedidos {
 
 model Products {
   id          Int       @id
+  photo       String
   name        String
   description String
   price       Float

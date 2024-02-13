@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import userModel from "../models/user.model";
+import userModel from "../models/auth.model";
 import { IToken, IUser } from '../types/user.type';
 
 import validatEmail from '../utils/validatEmail';
 import auth, { CustomRequest } from '../middleware/auth';
+import authModel from '../models/auth.model';
 
 const registerUser = async (req: Request, res: Response) => {
     try {
@@ -91,7 +92,20 @@ const newAccessToken = async (req: CustomRequest, res: Response) => {
     }
 };
 
+const logout = async (req: CustomRequest, res: Response) => {
+    try {
+        const userId = req.user.data.id
+        if(!userId) {
+            return res.status(409).json({message: 'Id do usuário inválido!'})
+        }
+        const logoutUser = await authModel.logoutUser(userId)
 
+        return res.status(200).json({message: 'Usuário deslogado!', logout: logoutUser})
+    } catch (error) {
+        console.error("Erro ao criar o AccessToken:", error);
+        res.status(500).json({ message: 'Erro ao criar o AccessToken' });
+    }
+}
 
 
 
@@ -99,4 +113,5 @@ export default {
     registerUser,
     login,
     newAccessToken,
+    logout
 };

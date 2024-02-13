@@ -31,6 +31,15 @@ const createAdmin = async (data: IUser) => {
     }
 }
 
+const createMenu = () => {
+    try {
+        
+    } catch (error) {
+        console.error("Error create menu:", error);
+        throw error;
+    }
+}
+
 export default {
     listUsers,
     createAdmin

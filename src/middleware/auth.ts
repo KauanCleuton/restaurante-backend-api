@@ -34,14 +34,6 @@ class JWTToken {
 
         jwt.verify(token, jwtSecret as Secret, (err: any, decoded: any) => {
             if (err) {
-                prisma.user.update({
-                    where: {
-                        id: req.user.data.id
-                    },
-                    data: {
-                        logged: false
-                    }
-                })
                 console.error("Erro ao verificar o token:", err);
                 return res.status(401).json({ error: 'Failed to authenticate token' });
             }
@@ -84,10 +76,24 @@ class JWTToken {
             next()
         }
         else {
-            return res.status(403).json({message: 'Acesso negado para usuários'})
+            return res.status(403).json({ message: 'Acesso negado para usuários' })
         }
     }
-
+    async verifyLogged(req: CustomRequest, res: Response, next: NextFunction) {
+        try {
+            const logged = await prisma.user.findUnique({
+                where: {
+                    id: req.user?.data.id
+                }
+            })
+            if (!logged?.logged) {
+                return res.status(403).json({ message: 'Faça login primeiro!' })
+            }
+            next()
+        } catch (error) {
+            console.error("Erro ao atualizar o status de log do usuário:", error);
+        }
+    }
 }
 
 export default new JWTToken;
