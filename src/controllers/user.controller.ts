@@ -1,26 +1,9 @@
 import { Request, Response } from 'express';
 import userModel from "../models/user.model";
 import { IToken, IUser } from '../types/user.type';
-import auth, { CustomRequest } from '../utils/auth';
+
 import validatEmail from '../utils/validatEmail';
-import jwt from 'jsonwebtoken'
-
-
-const listUser = async (req: Request, res: Response) => {
-    try {
-        const users = await userModel.listUsers();
-
-        if (users.length === 0) {
-            return res.status(200).json({ users: users });
-        }
-
-        console.table(users);
-        return res.status(200).json({ users: users });
-    } catch (error) {
-        console.error("Error listing users:", error);
-        return res.status(500).json({ message: 'Internal Server Error' });
-    }
-};
+import auth, { CustomRequest } from '../middleware/auth';
 
 const registerUser = async (req: Request, res: Response) => {
     try {
@@ -111,14 +94,9 @@ const newAccessToken = async (req: CustomRequest, res: Response) => {
 
 
 
-const rotaPrivada = (req: Request, res: Response) => {
-    return res.status(200).json({ message: 'Rota privada' })
-}
 
 export default {
-    listUser,
     registerUser,
     login,
-    rotaPrivada,
-    newAccessToken
+    newAccessToken,
 };

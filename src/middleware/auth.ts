@@ -1,6 +1,7 @@
 import jwt, { Secret } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { NextFunction, Request, Response } from 'express';
+import prisma from '../config/database';
 
 dotenv.config();
 
@@ -10,8 +11,8 @@ interface IToken {
 }
 export interface CustomRequest extends Request {
     user?: any; // ou substitua 'any' pelo tipo correto se souber o tipo exato
-  }
-  
+}
+
 
 class JWTToken {
     verifyToken(req: CustomRequest, res: Response, next: NextFunction) {
@@ -33,6 +34,14 @@ class JWTToken {
 
         jwt.verify(token, jwtSecret as Secret, (err: any, decoded: any) => {
             if (err) {
+                prisma.user.update({
+                    where: {
+                        id: req.user.data.id
+                    },
+                    data: {
+                        logged: false
+                    }
+                })
                 console.error("Erro ao verificar o token:", err);
                 return res.status(401).json({ error: 'Failed to authenticate token' });
             }
@@ -56,21 +65,28 @@ class JWTToken {
         return null
     }
     createRefreshToken(payload: IToken) {
-         if(payload) {
+        if (payload) {
             console.log('payload refreshToken', payload)
             const secret = process.env.JWT_SECRET
-            if(!secret) {
+            if (!secret) {
                 return false
             }
-            const refreshToken = jwt.sign({data: payload}, secret, {
+            const refreshToken = jwt.sign({ data: payload }, secret, {
                 subject: payload.id,
                 expiresIn: process.env.JWT_REFRESH
             })
             return refreshToken
-         }
-         return null
+        }
+        return null
     }
-    
+    verifyAdmin(req: CustomRequest, res: Response, next: NextFunction) {
+        if (req.user?.data.role === "admin") {
+            next()
+        }
+        else {
+            return res.status(403).json({message: 'Acesso negado para usuários'})
+        }
+    }
 
 }
 

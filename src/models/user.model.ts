@@ -7,17 +7,6 @@ interface ILogin {
     password: string
 }
 
-const listUsers = async () => {
-    try {
-        const users = await prisma.user.findMany();
-        return users;
-    } catch (error) {
-        console.error("Error fetching users:", error);
-        throw error;
-    }
-};
-
-
 const register = async (data: IUser) => {
     try {
         const hashPassword = await criptoPassoword.hashPassword(data.password);
@@ -69,8 +58,9 @@ const login = async (data: ILogin) => {
     }
 };
 
+
+
 export default {
     register,
-    listUsers,
-    login
+    login,
 };
