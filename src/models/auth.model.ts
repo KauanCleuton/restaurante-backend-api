@@ -1,5 +1,5 @@
 import prisma from "../config/database";
-import { IUser } from "../types/user.type";
+import { IUser } from "../types/types";
 import criptoPassoword from "../utils/criptoPassoword";
 
 interface ILogin {

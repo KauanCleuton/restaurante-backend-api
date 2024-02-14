@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import userModel from "../models/auth.model";
-import { IToken, IUser } from '../types/user.type';
+import { IToken, IUser } from '../types/types';
 
 import validatEmail from '../utils/validatEmail';
 import auth, { CustomRequest } from '../middleware/auth';
@@ -71,39 +71,20 @@ const login = async (req: Request, res: Response) => {
     }
 }
 
-const newAccessToken = async (req: CustomRequest, res: Response) => {
-    try {
-        const data = req.user?.data;
 
-        if (!data) {
-            return res.status(400).json({ message: 'token não fornecido' });
-        }
-
-        const accessToken = auth.createAccessToken(data);
-
-        if (!accessToken) {
-            return res.status(500).json({ message: 'Erro ao criar o AccessToken' });
-        }
-
-        res.json({ accessToken });
-    } catch (error) {
-        console.error("Erro ao criar o AccessToken:", error);
-        res.status(500).json({ message: 'Erro ao criar o AccessToken' });
-    }
-};
 
 const logout = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.user.data.id
-        if(!userId) {
-            return res.status(409).json({message: 'Id do usuário inválido!'})
+        if (!userId) {
+            return res.status(409).json({ message: 'Id do usuário inválido!' })
         }
         const logoutUser = await authModel.logoutUser(userId)
 
-        return res.status(200).json({message: 'Usuário deslogado!', logout: logoutUser})
+        return res.status(200).json({ message: 'Usuário deslogado!', logout: logoutUser })
     } catch (error) {
-        console.error("Erro ao criar o AccessToken:", error);
-        res.status(500).json({ message: 'Erro ao criar o AccessToken' });
+        console.error("Erro ao fazer logout: ", error);
+        res.status(500).json({ message: 'Erro ao fazer logout' });
     }
 }
 
@@ -112,6 +93,5 @@ const logout = async (req: CustomRequest, res: Response) => {
 export default {
     registerUser,
     login,
-    newAccessToken,
     logout
 };

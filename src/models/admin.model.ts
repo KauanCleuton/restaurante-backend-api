@@ -1,5 +1,6 @@
+import { UUID } from "typeorm/driver/mongodb/bson.typings";
 import prisma from "../config/database";
-import { IUser } from "../types/user.type";
+import { IProducts, IUser } from "../types/types";
 import criptoPassoword from "../utils/criptoPassoword";
 
 
@@ -31,9 +32,17 @@ const createAdmin = async (data: IUser) => {
     }
 }
 
-const createMenu = () => {
+const createMenu = async (data: IProducts) => {
     try {
-        
+        const products = await prisma.products.create({
+            data: {
+                ...data,
+            }
+        })
+
+        console.log(products)
+        return products
+
     } catch (error) {
         console.error("Error create menu:", error);
         throw error;
@@ -42,5 +51,6 @@ const createMenu = () => {
 
 export default {
     listUsers,
-    createAdmin
+    createAdmin,
+    createMenu
 };

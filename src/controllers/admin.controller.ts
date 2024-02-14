@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { IUser } from '../types/user.type';
+import { IProducts, IUser } from '../types/types';
 
 import validatEmail from '../utils/validatEmail';
 import adminModel from '../models/admin.model';
@@ -47,6 +47,29 @@ const createAdmin = async (req: Request, res: Response) => {
     }
 }
 
+const createMenu = async (req: Request, res: Response) => {
+    const { name, photo, category, description,price }:IProducts = req.body
+    try {
+        
+        if(!name || !photo || !category || !description || !price) {
+            return res.status(409).json({message: 'Campos Inválidos'})
+        }
+        const data = {
+            name, 
+            photo, 
+            category, 
+            description,
+            price: price
+        }
+        const products = adminModel.createMenu(data)
+        return res.status(201).json({message: 'Item adicionado ao menu!', menu: products})
+        
+    } catch (error) {
+        console.error("Error add menu:", error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 
 
 
@@ -60,5 +83,6 @@ const rotaPrivada = (req: Request, res: Response) => {
 export default {
     listUser,
     rotaPrivada,
-    createAdmin
+    createAdmin,
+    createMenu
 };

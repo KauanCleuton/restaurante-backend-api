@@ -16,67 +16,85 @@ export interface CustomRequest extends Request {
 
 class JWTToken {
     verifyToken(req: CustomRequest, res: Response, next: NextFunction) {
-        const jwtSecret = process.env.JWT_SECRET;
-        const auth = req.headers.authorization || req.headers.Authorization;
+        const accessToken = req.headers.authorization?.split(' ')[1];
+        if (!accessToken) return false
+        try {
+            const secret = process.env.JWT_SECRET;
+            if (!secret) return res.status(500).json({ message: 'Chave secreta não definida' });
 
-        if (!auth) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-        if (typeof auth !== 'string') {
-            return res.status(401).json({ error: 'Invalid token format' });
-        }
-
-        const token = auth.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ error: 'Invalid token format' });
-        }
-
-        jwt.verify(token, jwtSecret as Secret, (err: any, decoded: any) => {
-            if (err) {
-                console.error("Erro ao verificar o token:", err);
-                return res.status(401).json({ error: 'Failed to authenticate token' });
+            const decoded = jwt.verify(accessToken, secret) as unknown as { data: IToken, type: string } | null;
+            if (!decoded || decoded.type !== 'access') {
+                return res.status(401).json({ message: 'AccessToken inválido' });
             }
-            req.user = decoded
-            next()
+            req.user = decoded;
+            next();
+        } catch (error) {
+            console.error(error);
+            res.status(401).json({ message: 'AccessToken inválido' });
+        }
+    }
+    // createAccessToken(payload: IToken) {
+    //     if (payload) {
+    //         console.log('payload token', payload)
+    //         const secret = process.env.JWT_SECRET
+    //         if (!secret) {
+    //             return false
+    //         }
+    //         const token = jwt.sign({ data: payload }, secret, {
+    //             subject: payload.id,
+    //             expiresIn: process.env.JWT_ACCESS
+    //         })
+    //         return token
+    //     }
+    //     return null
+    // }
+    createAccessToken(payload: IToken, refresh = 0 || false) {
+        if (!payload) return false;
+        const secret = process.env.JWT_SECRET
+        if (!secret) {
+            return false
+        }
+        return jwt.sign({ data: payload, type: refresh ? 'refresh' : 'access' }, secret, {
+            expiresIn: refresh
+                ? process.env.JWT_REFRESH
+                : process.env.JWT_ACCESS,
         });
-    }
-    createAccessToken(payload: IToken) {
-        if (payload) {
-            console.log('payload token', payload)
-            const secret = process.env.JWT_SECRET
-            if (!secret) {
-                return false
+    };
+
+    refreshToken(req: Request, res: Response) {
+        const { refreshToken } = req.body;
+        const auth = new JWTToken()
+        try {
+            const secret = process.env.JWT_SECRET;
+            if (!secret) return res.status(500).json({ message: 'Chave secreta não definida' });
+
+            const decoded = jwt.verify(refreshToken, secret) as { data: IToken, type: string } | null;
+            if (!decoded || decoded.type !== 'refresh') {
+                return res.status(401).json({ message: 'Refresh token inválido' });
             }
-            const token = jwt.sign({ data: payload }, secret, {
-                subject: payload.id,
-                expiresIn: process.env.JWT_ACCESS
-            })
-            return token
+
+            console.log(decoded.data, 'Kaaudansdnasdnsndasndnas 88888888888')
+            const accessToken = auth.createAccessToken(decoded.data)
+            console.log('data', decoded.data);
+            console.log('NRT', accessToken);
+
+            res.json({ accessToken });
+        } catch (error) {
+            console.error(error);
+            res.status(401).json({ message: 'Refresh token inválido' });
         }
-        return null
-    }
+    };
+
     createRefreshToken(payload: IToken) {
-        if (payload) {
-            console.log('payload refreshToken', payload)
-            const secret = process.env.JWT_SECRET
-            if (!secret) {
-                return false
-            }
-            const refreshToken = jwt.sign({ data: payload }, secret, {
-                subject: payload.id,
-                expiresIn: process.env.JWT_REFRESH
-            })
-            return refreshToken
-        }
-        return null
-    }
+        return this.createAccessToken(payload, true);
+    };
+
     verifyAdmin(req: CustomRequest, res: Response, next: NextFunction) {
         if (req.user?.data.role === "admin") {
             next()
         }
         else {
-            return res.status(403).json({ message: 'Acesso negado para usuários' })
+            return res.status(403).json({ message: 'Acesso Negado! Você não é um administrador!' })
         }
     }
     async verifyLogged(req: CustomRequest, res: Response, next: NextFunction) {
@@ -86,6 +104,7 @@ class JWTToken {
                     id: req.user?.data.id
                 }
             })
+
             if (!logged?.logged) {
                 return res.status(403).json({ message: 'Faça login primeiro!' })
             }
