@@ -19,4 +19,8 @@ routes.get("/users", auth.verifyToken, auth.verifyAdmin, auth.verifyLogged, admi
 routes.post("/create-admin", auth.verifyToken, auth.verifyAdmin, auth.verifyLogged, adminController.createAdmin)
 routes.post("/add-menu", auth.verifyToken, auth.verifyAdmin, auth.verifyLogged, adminController.createMenu)
 
+
+// rotas users and admin
+routes.get("/menu", auth.verifyToken, auth.verifyLogged, adminController.allProductsMenu)
+
 export default routes

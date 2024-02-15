@@ -35,11 +35,8 @@ const createAdmin = async (data: IUser) => {
 const createMenu = async (data: IProducts) => {
     try {
         const products = await prisma.products.create({
-            data: {
-                ...data,
-            }
+            data: data
         })
-
         console.log(products)
         return products
 
@@ -49,8 +46,20 @@ const createMenu = async (data: IProducts) => {
     }
 }
 
+const allProductsMenu = async () => {
+    try {
+        const products = await prisma.products.findMany()
+        console.table(products)
+        return products
+    } catch (error) {
+        console.error("Error list all menu:", error);
+        throw error;
+    }
+}
+
 export default {
     listUsers,
     createAdmin,
-    createMenu
+    createMenu,
+    allProductsMenu
 };

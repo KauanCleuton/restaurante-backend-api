@@ -70,7 +70,20 @@ const createMenu = async (req: Request, res: Response) => {
     }
 }
 
+const allProductsMenu = async (req: Request, res: Response) => {
+    try {
+        const products = await adminModel.allProductsMenu()
 
+        if(!products) {
+            return res.status(409).json({message: 'Não existe nenhum item no menu!'})
+        }
+        console.log(products, 'Kauan Cleuton da Silvaaaaaaaaaaaaaaaaa')
+        return res.status(200).json({menu: products})
+    } catch (error) {
+        console.error("Error add menu:", error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 
 
 
@@ -84,5 +97,6 @@ export default {
     listUser,
     rotaPrivada,
     createAdmin,
-    createMenu
+    createMenu,
+    allProductsMenu
 };
