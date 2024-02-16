@@ -2,6 +2,7 @@ import { UUID } from "typeorm/driver/mongodb/bson.typings";
 import prisma from "../config/database";
 import { IProducts, IUser } from "../types/types";
 import criptoPassoword from "../utils/criptoPassoword";
+import { Prisma } from "@prisma/client";
 
 
 const listUsers = async () => {
@@ -57,9 +58,44 @@ const allProductsMenu = async () => {
     }
 }
 
+const editProductsMenu = async (id: number, data: { name?: string, photo?: string, description?: string, price?: number, category?: string }) => {
+    try {
+        const edit = await prisma.products.update({
+            where: {
+                id: id
+            },
+            data: {
+                ...data
+            }
+        });
+        console.log(edit);
+        return edit;
+    } catch (error) {
+        console.error("Erro ao editar item do menu:", error);
+        throw error;
+    }
+}
+
+const deleteProductsItem = async (id: number) => {
+    try {
+        const deleteItem = await prisma.products.delete({
+            where: {
+                id: id
+            }
+        })
+        console.log('Item deletado!', deleteItem)
+        return deleteItem
+    } catch (error) {
+        console.error("Erro ao deletar item do menu:", error);
+        throw error;
+    }
+}
+
 export default {
     listUsers,
     createAdmin,
     createMenu,
-    allProductsMenu
+    allProductsMenu,
+    editProductsMenu,
+    deleteProductsItem
 };
