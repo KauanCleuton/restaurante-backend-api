@@ -10,3 +10,10 @@ export interface IToken {
     role: string
 }
 
+export interface IProducts {
+  photo: string,
+  name: string,
+  description: string,
+  price: number,
+  category: string,
+}
